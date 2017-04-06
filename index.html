@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejemplo camara</title>
+    <script src="node_modules/parse/dist/parse.js"></script>
+</head>
+<body>
+   
+    
+    <form id="contact-form" class="contact-form" method="post" action=""  name="validation">
+            <div class="form-group row" id="price">                
+                <div class="col-lg-4">
+                    <input type="text" name="fname" class="form-control" id="fname" placeholder="First *" required >
+                </div>
+
+                <div class="col-lg-4">
+                    <input type="text" name="lname" class="form-control" id="lname" placeholder="Last *" required>
+                </div>
+
+                <div class="col-lg-4">
+                    <input type="text" name="email" class="form-control" id="email" placeholder="E-mail *"  required>
+                </div>        
+                <div class="col-lg-4">
+                    <input accept="image/*" id="image" name="myImage" onchange="previewImage()" type="file"  capture/>
+                </div>          
+            </div>
+
+            </div>
+            <div class="form-group row" align="center">
+              <div class="col-lg-12" align="center">                
+                <button type="submit" class="button default">SEND <i class="glyphicon glyphicon-send"></i></button>
+              </div>
+            </div>
+            
+    </form>
+    <img id="uploadPreview" style="width: 100px; height: 100px;" />       
+   
+    
+    <div id="map"></div>
+    
+    <button onclick="parseConection()">Holis</button>
+    <button onclick="parseConsulta()">Consulta</button>
+    
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <script src="main.js"></script>
+    <script>
+        
+        //PRIMERA FORMA
+        Parse.initialize("nyctwo");
+        Parse.serverURL = 'http://138.197.71.215:1337/parse';
+        
+        
+        function previewImage() {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(document.getElementById("image").files[0]);
+
+            oFReader.onload = function (oFREvent) {
+                document.getElementById("uploadPreview").src = oFREvent.target.result;
+            };
+    };
+
+        
+        
+        var ParseObj = Parse.Object.extend('myClass'); //create local parse object from your Parse class
+
+        $('#contact-form').submit(function(e) {
+        //on form submit
+            e.preventDefault();
+
+            //get data from form
+            var data = {
+                fname: $("#fname").val(),
+                lname: $("#lname").val(),
+                email: $("#email").val()
+            };
+            console.log(data);
+            
+            parseObj = new ParseObj();
+            //create new Parse object
+            /*
+            parseObj.set('fname',data.fname);
+            parseObj.set('lname',data.lname);
+            parseObj.set('email',data.email);
+            */
+            //match the key values from the form, to your parse class, then save it
+            parseObj.save(data, {
+                    //if successful
+                    success: function(parseObj) {
+                            alert(parseObj.get('fname') + " " + parseObj.get('lname') + " " + parseObj.get('email') + " saved to Parse.")
+                        }
+                    ,
+                    error: function(parseObj, error) {
+                        console.log(parseObj);
+                        console.log(error);
+                    }
+                }
+            );
+        });
+
+                                  
+         //SEGUNDA FORMA                         
+        function parseConection() {
+            alert('Holis');
+            
+            var TableMessage = Parse.Object.extend("Message");
+            var tableMessage = new TableMessage();
+            tableMessage.set("emisor", 'Mari');
+            tableMessage.set("mensaje", 'HOLIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII Buenas noches');
+            tableMessage.set("foto", 'HOLIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII Buenas noches');
+            
+
+            tableMessage.save(null, {
+                success: function(tableMessage) {
+
+                },
+                error: function(tableMessage, error) {
+                    console.log("Error: " + error.code + " " + error.message);
+                }
+            });
+
+        }
+        
+        function parseConsulta(){
+            var TableMessage = Parse.Object.extend("Message");
+            var query = new Parse.Query(TableMessage);
+            
+            query.equalTo('emisor','Mari');
+            query.include('Message');
+            
+            query.find({
+               success: function(results){
+                    for (var i = 0; i < results.length; i++) {
+                               var object = results[i];
+                                console.log(object.get('mensaje'));
+                        
+                        }
+               },
+                error: function(message){
+                    
+                },
+            });
+        }
+    </script>
+    
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
